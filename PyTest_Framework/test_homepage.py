@@ -1,18 +1,16 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Sep 29 23:59:57 2023
-
-@author: mahesh
-"""
-
-from selenium.webdriver.common.by import By
 import pytest
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 @pytest.mark.usefixtures("setup")
-class Test_HomePage():
-    
-    def test_home(self,login):
-        driver = self.driver
-        driver.find_element(By.XPATH, "//i[@class='fas fa-home']").click()
-        
+def test_home(login):
+    # Access 'driver' via the 'login' fixture
+    driver = login
+
+
+
+
+
+

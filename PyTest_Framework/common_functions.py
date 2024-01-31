@@ -30,3 +30,9 @@ def send_keys_to_element(driver, element, keys_to_send, timeout=10):
         print(f"Keys '{keys_to_send}' sent to element successfully.")
     except Exception as e:
         print(f"Exception occurred while sending keys to element: {e}")
+
+
+def assert_element_text(element, expected_text):
+    actual_text = element.text
+    assert actual_text == expected_text, f"Assertion failed: Expected '{expected_text}' but got '{actual_text}'"
+    print("Assertion passed")

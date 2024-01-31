@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Sep 29 23:59:57 2023
-
-@author: mahesh
-"""
-
 import pytest
 import pandas as pd
 from selenium import webdriver
@@ -16,15 +9,13 @@ from webdriver_manager.chrome import ChromeDriverManager
 import os
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="function")
 def setup(request):
-    global driver
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
     driver.maximize_window()
     driver.implicitly_wait(5)
-    request.cls.driver = driver
-    yield
-    driver.close()
+    yield driver
+    driver.quit()
 
 
 def excel_read():
@@ -53,7 +44,8 @@ def data(request):
 
 
 @pytest.fixture
-def login(data):
+def login(request, setup, data):
+    driver = setup
     driver.get(data['URL'])
     WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//span[text()='My Account']")))
     driver.find_element(By.XPATH, "//span[text()='My Account']").click()
@@ -65,3 +57,4 @@ def login(data):
     driver.find_element(By.ID, "input-password").send_keys(data['Password'])
     WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Login']")))
     driver.find_element(By.XPATH, "//button[text()='Login']").click()
+    return driver
