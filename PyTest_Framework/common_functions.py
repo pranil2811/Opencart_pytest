@@ -26,6 +26,7 @@ def send_keys_to_element(driver, element, keys_to_send, timeout=10):
         WebDriverWait(driver, timeout).until(
             EC.visibility_of(element)
         )
+        element.clear()
         element.send_keys(keys_to_send)
         print(f"Keys '{keys_to_send}' sent to element successfully.")
     except Exception as e:
