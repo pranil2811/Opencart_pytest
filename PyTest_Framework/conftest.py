@@ -13,14 +13,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
+import os
+
 
 @pytest.fixture(scope="class")
 def setup(request):
     global driver
-    # edgedriver_path = r"C:\Users\Admin\Desktop\Pranil\Restart_Jan_24\PyTest_Framework\PyTest_Framework\browser_drivers\chromedriver\chromedriver.exe"
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
-    driver.maximize_window()
-    #driver.get("http://localhost/opencart/")
     driver.maximize_window()
     driver.implicitly_wait(5)
     request.cls.driver = driver
@@ -29,18 +28,23 @@ def setup(request):
 
 
 def excel_read():
-    excelsheet_path = r'C:\Users\Admin\Desktop\Pranil\Restart_Jan_24\PyTest_Framework\PyTest_Framework\input_datasheet.xlsx'
-    df = pd.read_excel(excelsheet_path,sheet_name='Sheet1',dtype=object).fillna("")
+    current_dir = os.path.abspath(os.path.dirname(__file__))
+    excelsheet_path = os.path.join(current_dir, 'input_datasheet.xlsx')
 
-    for rows in range(df.shape[0]):
-        flag = df["Flag"][rows]
+    try:
+        df = pd.read_excel(excelsheet_path, sheet_name='Sheet1', dtype=object).fillna("")
+    except FileNotFoundError as e:
+        print(f"File not found: {excelsheet_path}")
+        return
 
+    for index, row in df.iterrows():
+        flag = row["Flag"]
         try:
             if flag == 'Y':
-                yield df.iloc[rows]
+                yield row
         except Exception as e:
-            print("Exception:-"+str(e).strip()+" of type:-"+str(type(e))+" occured")
-            raise Exception(e)
+            print(f"Exception: {e} occurred at index {index}")
+            raise  # Re-raise the exception if needed
 
 
 @pytest.fixture(params=excel_read())
@@ -61,6 +65,3 @@ def login(data):
     driver.find_element(By.ID, "input-password").send_keys(data['Password'])
     WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Login']")))
     driver.find_element(By.XPATH, "//button[text()='Login']").click()
-    
-    
-    
